@@ -1,14 +1,17 @@
-#Enabling the internal registry
+#**Enabling the internal registry
 
-In OCP4.3 and up, the installer detects if the environment is baremetal - and in such a case disables the registry. This will happen in all our libvirt environments as well. You will see errors such as this:
-
+##In OCP4.3 and up, the installer detects if the environment is baremetal - and in such a case disables the registry. This will happen in all our libvirt environments as well. 
+You will see errors such as this:##
+```
 bc/ruby-hello-world is pushing to istag/ruby-hello-world:latest, but the administrator has not configured the integrated container image registry.
-
-Here are the steps I took to get my registry working:
-1) Created an NFS share on the host:
+```
+##Here are the steps I took to get my registry working:
+    _ Created an NFS share on the host:
+    ```
 mkdir /mnt/export_dir
 chown nfsnobody:nfsnobody /mnt/export_dir
 chmod 700 /mnt/export_dir
+    ```
 
 2) In /etc/exports.d/export_dir.exports:
 /mnt/export_dir *(rw,async,all_squash,no_wdelay,insecure,fsid=0)
