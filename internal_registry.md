@@ -1,30 +1,36 @@
-#Enabling the internal registry
+# Enabling the internal registry
 
-##In OCP4.3 and up, the installer detects if the environment is baremetal - and in such a case disables the registry. This will happen in all our libvirt environments as well. 
-You will see errors such as this:##
+In OCP4.3 and up, the installer detects if the environment is baremetal - and in such a case disables the registry. This will happen in all our libvirt environments as well.
+You will see errors such as this:
 ```
 bc/ruby-hello-world is pushing to istag/ruby-hello-world:latest, but the administrator has not configured the integrated container image registry.
 ```
-##Here are the steps I took to get my registry working:
-    _ Created an NFS share on the host:
-    ```
+Here are the steps I took to get my registry working:
+
+1. Created an NFS share on the host:
+```
 mkdir /mnt/export_dir
 chown nfsnobody:nfsnobody /mnt/export_dir
 chmod 700 /mnt/export_dir
-    ```
-
-2) In /etc/exports.d/export_dir.exports:
+```
+2. In /etc/exports.d/export_dir.exports:
+```
 /mnt/export_dir *(rw,async,all_squash,no_wdelay,insecure,fsid=0)
-
-3) Run th exportfs command on the host, and if needed also start the nfs service:
+```
+3. Run th exportfs command on the host, and if needed also start the nfs service:
+```
 exportfs -a
 systemctl enable --now nfs
-
-4) Create a PV using NFS, with 100GiB at least:
+```
+4. Create a PV using NFS, with 100GiB at least:
+```
+vi nfs-pv.yaml
+```
+```
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: titan90data
+  name: titan40data
 spec:
   capacity:
     storage: 100Gi
@@ -32,15 +38,23 @@ spec:
   - ReadWriteMany
   nfs:
     path: /mnt/export_dir
-    server: titan90.lab.eng.tlv2.redhat.com
+    server: titan40.lab.eng.tlv2.redhat.com
   persistentVolumeReclaimPolicy: Recycle
-
-5) Change the registry configuration, and set managementState and the storage as in the below. Leave the claim field blank so that a PVC will be created automatically:
+```
+```
+oc create -f nfs-pv.yaml
+oc get pv
+```
+5. Change the registry configuration, and set managementState and the storage as in the below. Leave the claim field blank so that a PVC will be created automatically:
+```
 oc edit configs.imageregistry.operator.openshift.io
 spec:
   managementState: Managed
   storage:
     pvc:
       claim:
-
-6) Look at the ConfigMaps in the openshift-image-registry namespace, and add the certificate from the "serviceca" configmap to the list of certificates in the "trusted-ca" configmap
+```
+6. Look at the ConfigMaps in the openshift-image-registry namespace, and add the certificate from the "serviceca" configmap to the list of certificates in the "trusted-ca" configmap
+```
+oc edit configmaps -n openshift-image-registry
+```
