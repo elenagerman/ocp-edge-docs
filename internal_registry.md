@@ -1,4 +1,4 @@
-#**Enabling the internal registry
+#Enabling the internal registry
 
 ##In OCP4.3 and up, the installer detects if the environment is baremetal - and in such a case disables the registry. This will happen in all our libvirt environments as well. 
 You will see errors such as this:##
