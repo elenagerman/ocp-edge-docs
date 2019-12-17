@@ -5,6 +5,7 @@ The same steps can be achieved from the [ocp-edge-demo-virt job](https://jenkins
 ```bash
 [root@sealusa2 ~]# mkdir ocp-edge-virt-env
 [root@sealusa2 ~]# cd ocp-edge-virt-env/
+[root@sealusa2 ~]# yum install python3-virtualenv
 [root@sealusa2 ocp-edge-virt-env]# virtualenv virtualenv
 [root@sealusa2 ocp-edge-virt-env]# source virtualenv/bin/activate
 (virtualenv) [root@sealusa2 ocp-edge-virt-env]# yum install -y libvirt-devel python-virtualenv gcc git libvirt-python
