@@ -3,22 +3,22 @@ The following steps create the virtual test environment infrastructure including
 The same steps can be achieved from the [ocp-edge-demo-virt job](https://jenkins-fci-continuous-productization.cloud.paas.psi.redhat.com/job/ocp-edge-demo-virt/) by selecting the Provision stage only, without running the Deploy stage.
 
 ```bash
-[root@sealusa2 ~]# mkdir ocp-edge-virt-env
-[root@sealusa2 ~]# cd ocp-edge-virt-env/
-[root@sealusa2 ~]# yum install python3-virtualenv
-[root@sealusa2 ocp-edge-virt-env]# virtualenv virtualenv
-[root@sealusa2 ocp-edge-virt-env]# source virtualenv/bin/activate
-(virtualenv) [root@sealusa2 ocp-edge-virt-env]# yum install -y libvirt-devel python-virtualenv gcc git libvirt-python
-(virtualenv) [root@sealusa2 ocp-edge-virt-env]# pip install ansible==2.8 linchpin==1.7.6.2 libvirt-python netaddr lxml
-(virtualenv) [root@sealusa2 ocp-edge-virt-env]# source virtualenv/bin/install_selinux_venv.sh 
-(virtualenv) [root@sealusa2 ocp-edge-virt-env]# git -c http.sslVerify=false clone https://gitlab.cee.redhat.com/ocp-edge-qe/ocp-edge-demo.git
-(virtualenv) [root@sealusa2 ocp-edge-virt-env]# cd ocp-edge-demo/linchpin-workspace/
+[root@titan47 ~]# mkdir ocp-edge-virt-env
+[root@titan47 ~]# cd ocp-edge-virt-env/
+[root@titan47 ~]# yum install -y libvirt-devel python3-virtualenv gcc git libvirt-python3
+[root@titan47 ~]#dnf localinstall -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/sshpass/1.06/3.el8ae/x86_64/sshpass-1.06-3.el8ae.x86_64.rpm
+[root@titan47 ocp-edge-virt-env]# virtualenv virtualenv
+[root@titan47 ocp-edge-virt-env]# source virtualenv/bin/activate
+(virtualenv) [root@titan47 ocp-edge-virt-env]# pip install ansible==2.8 linchpin libvirt-python netaddr lxml
+(virtualenv) [root@titan47 ocp-edge-virt-env]# curl -o virtualenv/bin/install_selinux_venv.sh https://raw.githubusercontent.com/CentOS-PaaS-SIG/linchpin/1792bb8fa02c4acbef63c987f715f0c3cf8b193e/scripts/install_selinux_venv.sh; bash -x virtualenv/bin/install_selinux_venv.sh 
+(virtualenv) [root@titan47 ocp-edge-virt-env]# git -c http.sslVerify=false clone https://gitlab.cee.redhat.com/ocp-edge-qe/ocp-edge-demo.git
+(virtualenv) [root@titan47 ocp-edge-virt-env]# cd ocp-edge-demo/linchpin-workspace/
 ## Edit custom vars in hooks/ansible/ocp-edge-setup/extravars.yaml if needed
-(virtualenv) [root@sealusa2 linchpin-workspace]# ansible -c local localhost -m template -a "src=hooks/ansible/ocp-edge-setup/extravars.yaml dest=$PWD/extravars.yaml" -e @hooks/ansible/ocp-edge-setup/extravars.yaml
-(virtualenv) [root@sealusa2 linchpin-workspace]# linchpin --template-data @extravars.yaml -v destroy libvirt-network libvirt-new
-(virtualenv) [root@sealusa2 linchpin-workspace]# linchpin --template-data @extravars.yaml -v up libvirt-network libvirt-new cfgs
+(virtualenv) [root@titan47 linchpin-workspace]# ansible -c local localhost -m template -a "src=hooks/ansible/ocp-edge-setup/extravars.yaml dest=$PWD/extravars.yaml" -e @hooks/ansible/ocp-edge-setup/extravars.yaml
+(virtualenv) [root@titan47 linchpin-workspace]# linchpin --template-data @extravars.yaml -v destroy libvirt-network libvirt-new
+(virtualenv) [root@titan47 linchpin-workspace]# linchpin --template-data @extravars.yaml -v up libvirt-network libvirt-new cfgs
 
-(virtualenv) [root@sealusa2 linchpin-workspace]# virsh list --all
+(virtualenv) [root@titan47 linchpin-workspace]# virsh list --all
  Id    Name                           State
 ----------------------------------------------------
  14    worker-1                       running
@@ -27,14 +27,14 @@ The same steps can be achieved from the [ocp-edge-demo-virt job](https://jenkins
  -     master-2                       shut off
  -     worker-0                       shut off
 
-(virtualenv) [root@sealusa2 linchpin-workspace]# virsh net-list
+(virtualenv) [root@titan47 linchpin-workspace]# virsh net-list
  Name                 State      Autostart     Persistent
 ----------------------------------------------------------
  baremetal            active     no            yes
  default              active     yes           yes
  provisioning         active     no            yes
 
-[root@sealusa2 ~]# /root/.virtualenvs/vbmc/bin/python /root/.virtualenvs/vbmc/bin/vbmc list
+[root@titan47 ~]# /root/.virtualenvs/vbmc/bin/python /root/.virtualenvs/vbmc/bin/vbmc list
 +-------------+---------+----------------------+------+
 | Domain name | Status  | Address              | Port |
 +-------------+---------+----------------------+------+
@@ -52,7 +52,7 @@ The same steps can be achieved from the [ocp-edge-demo-virt job](https://jenkins
 The commands below include all steps required for deploying the environment with dev-scripts
 
 ```
-(virtualenv) [root@sealusa2 linchpin-workspace]# ssh kni@provisionhost
+(virtualenv) [root@titan47 linchpin-workspace]# ssh kni@provisionhost
 Warning: Permanently added 'provisionhost,192.168.123.111' (ECDSA) to the list of known hosts.
 Activate the web console with: systemctl enable --now cockpit.socket
 
