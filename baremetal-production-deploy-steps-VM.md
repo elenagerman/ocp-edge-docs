@@ -11,29 +11,26 @@ The following steps create the virtual test environment  infrastructure includin
 * 6 virtual servers (1 provision node, 3 master and 2 worker nodes)
 * DNS and DHCP servers will be run on hypervisor
 * Each server will have 2 NICs pre-configured. NIC1 for the private network and NIC2 for the external network. NIC interface names need to be identical. See [issue](https://github.com/openshift/installer/issues/2762)
-* Each server will have a RAID-1 configured and initialized
 * Each server will have BMC configured __(IPMI)__
 * Each server will have DHCP setup for external NICs
 * Each server will have DNS setup for the API
 
-__NOTE:__ PXE could not be enabled on virtual environment
-
 ### Reserved IPs on DHCP Server
-__cluster-name:__ ocp-edge
+__cluster-name:__ ocp-edge-cluster
 
 __domain:__ qe.lab.redhat.com
 
 | Usage   |      Hostname      |  IP |
 |----------|-------------|------|
 | API | api.ocp-edge.qe.lab.redhat.com | 10.19.138.14 |
-| Ingress LB (apps) |  *.apps.ocp-edge.qe.lab.redhat.com  | 10.19.138.15 |
-| Nameserver(DNS) | ns1.ocp-edge.qe.lab.redhat.com | 10.19.138.16 |
-| Provisioning node | provisioner.ocp-edge.qe.lab.redhat.com | 10.19.138.10 |
-| Master-0 | ocp-edge-master-0.qe.lab.redhat.com | 10.19.138.11 |
-| Master-1 | ocp-edge-master-1.qe.lab.redhat.com | 10.19.138.12 |
-| Master-2 | ocp-edge-master-2.qe.lab.redhat.com | 10.19.138.13 |
-| Worker-0 | ocp-edge-worker-0.qe.lab.redhat.com | 10.19.138.8 |
-| Worker-1 | ocp-edge-worker-1.qe.lab.redhat.com | 10.19.138.9 |
+| Ingress LB (apps) |  *.apps.ocp-edge-cluster.qe.lab.redhat.com  | 10.19.138.15 |
+| Nameserver(DNS) | ns1.ocp-edge-cluster.qe.lab.redhat.com | 10.19.138.16 |
+| Provisioning node | provisioner.ocp-edge-cluster.qe.lab.redhat.com | 10.19.138.10 |
+| Master-0 | ocp-edge-cluster-master-0.qe.lab.redhat.com | 10.19.138.11 |
+| Master-1 | ocp-edge-cluster-master-1.qe.lab.redhat.com | 10.19.138.12 |
+| Master-2 | ocp-edge-cluster-master-2.qe.lab.redhat.com | 10.19.138.13 |
+| Worker-0 | ocp-edge-cluster-worker-0.qe.lab.redhat.com | 10.19.138.8 |
+| Worker-1 | ocp-edge-cluster-worker-1.qe.lab.redhat.com | 10.19.138.9 |
 
 ```bash
 mkdir ocp-edge-virt-env
@@ -46,6 +43,13 @@ pip install ansible==2.8 linchpin==1.7.6.2 libvirt-python netaddr lxml
 curl -o virtualenv/bin/install_selinux_venv.sh https://raw.githubusercontent.com/CentOS-PaaS-SIG/linchpin/1792bb8fa02c4acbef63c987f715f0c3cf8b193e/scripts/install_selinux_venv.sh; bash -x virtualenv/bin/install_selinux_venv.sh
 git -c http.sslVerify=false clone https://gitlab.cee.redhat.com/ocp-edge-qe/ocp-edge-demo.git
 cd ocp-edge-demo/linchpin-workspace/
+```
+__IMPORTANT:__
+   Edit custom vars in hooks/ansible/ocp-edge-setup/extravars.yaml 
+   Take care about cluster_name, base_domain and cluster_domain are set correctly
+   For example: cluster_name = ocp-edge-cluster; base_domain = qe.lab.redhat.com
+                cluster_domain = ocp-edge-cluster.qe.lab.redhat.com
+```
 ## Edit custom vars in hooks/ansible/ocp-edge-setup/extravars.yaml if needed
 ansible -c local localhost -m template -a "src=hooks/ansible/ocp-edge-setup/extravars.yaml dest=$PWD/extravars.yaml" -e @hooks/ansible/ocp-edge-setup/extravars.yaml
 linchpin --template-data @extravars.yaml -v destroy libvirt-network libvirt-new
@@ -266,7 +270,7 @@ baseDomain: qe.lab.redhat.com
 networking:
   machineCIDR: 192.168.123.0/24
 metadata:
-  name: ocp-edge-cluster-cdv
+  name: ocp-edge-cluster
 compute:
 - name: worker
   replicas: 3
