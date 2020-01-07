@@ -10,7 +10,7 @@ Here are the steps I took to get my registry working:
 1. Created an NFS share on the host:
 ```
 mkdir /mnt/export_dir
-chown nfsnobody:nfsnobody /mnt/export_dir
+chown nobody:nobody /mnt/export_dir
 chmod 700 /mnt/export_dir
 ```
 2. In /etc/exports.d/export_dir.exports:
@@ -20,7 +20,7 @@ chmod 700 /mnt/export_dir
 3. Run th exportfs command on the host, and if needed also start the nfs service:
 ```
 exportfs -a
-systemctl enable --now nfs
+systemctl enable --now nfs-server
 ```
 4. Create a PV using NFS, with 100GiB at least:
 ```
